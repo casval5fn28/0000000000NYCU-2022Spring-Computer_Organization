@@ -12,9 +12,11 @@ assign func3 = instr[2:0];
 always @(*) begin
 	if(ALUOp == 2'b00) begin 			//lw,sw
 		ALU_Ctrl_o <= 4'b0010; 
-	end	else if(ALUOp == 2'b01) begin 	//beq
+	end
+	else if(ALUOp == 2'b01) begin 	//beq
 		ALU_Ctrl_o <= 4'b0110; 
-	end	else if(ALUOp == 2'b10) begin	//R-type
+	end
+	else if(ALUOp == 2'b10) begin	//R-type
 		case(instr)
             4'b0000: begin              //add
                 ALU_Ctrl_o <= 4'b0010;
@@ -44,7 +46,8 @@ always @(*) begin
                 ALU_Ctrl_o <= 4'b0000;
 			end         
         endcase
-	end	else if(ALUOp == 2'b11) begin
+	end
+	else if(ALUOp == 2'b11) begin
 		case(func3)
             3'b000: begin              //addi
                 ALU_Ctrl_o <= 4'b0010;
@@ -59,7 +62,8 @@ always @(*) begin
                 ALU_Ctrl_o <= 4'b0001;
 			end       
         endcase
-	end	else begin
+	end
+	else begin
 		ALU_Ctrl_o <= 4'b1111;
 	end
 end	
