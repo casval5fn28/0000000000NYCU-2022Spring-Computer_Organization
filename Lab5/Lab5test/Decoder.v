@@ -101,7 +101,7 @@ always@ (*) begin
             Jump <= 1;
             //write_back1 <= 1;
             //write_back0 <= 0;
-            MemtoReg <= 0;
+            MemtoReg <= 1;
             MemRead <= 0;
             MemWrite <= 0;
             ALUSrc <= 0;

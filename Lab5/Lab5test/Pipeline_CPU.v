@@ -83,26 +83,18 @@ wire [31:0] MEMWB_PC_Add4_o;
 
 wire [31:0] instr;
 wire [31:0] Imm_4 = 4;
-wire [32-1:0] pc_add4_o;
 wire [31:0] MUX_control_o_32;
 wire [31:0] RDdata_o;
 
 assign MUX_control_o = MUX_control_o_32[7:0];
-assign MUXPCSrc = (Branch & Branch_zero) | Jump;
-assign Branch_zero = branch_zero;
-reg branch_zero;
-
-always @(*) begin
-    if (RSdata_o == RDdata_o) begin
-        branch_zero <= 1;
-    end
-end
+assign IFID_Flush = (Branch && Branch_zero ) || Jump;
+assign Branch_zero = (RSdata_o == RTdata_o);
 
 // IF
 MUX_2to1 MUX_PCSrc(
     .data0_i(PC_Add_Immediate),
-    .data1_i(pc_add4_o),
-    .select_i(MUXPCSrc),
+    .data1_i(PC_Add4),
+    .select_i(~IFID_Flush),
     .data_o(PC_i)
 );
 
@@ -117,7 +109,7 @@ ProgramCounter PC(
 Adder PC_plus_4_Adder(
     .src1_i(PC_o),
     .src2_i(Imm_4),
-    .sum_o(pc_add4_o)
+    .sum_o(PC_Add4)
 );
 
 Instr_Memory IM(
@@ -132,7 +124,7 @@ IFID_register IFtoID(
     .IFID_write(IFID_Write),
     .address_i(PC_o),
     .instr_i(instr),
-    .pc_add4_i(pc_add4_o),
+    .pc_add4_i(PC_Add4),
     .address_o(IFID_PC_o),
     .instr_o(IFID_Instr_o),
     .pc_add4_o(IFID_PC_Add4_o)
@@ -223,7 +215,7 @@ IDEXE_register IDtoEXE(
 
 // EXE
 MUX_2to1 MUX_ALUSrc (
-    .data0_i(ALUSrc2_o),
+    .data0_i(IDEXE_RTdata_o),
     .data1_i(IDEXE_ImmGen_o),
     .select_i(MUX_control_o[7]),
     .data_o(MUXALUSrc_o)
@@ -249,7 +241,7 @@ MUX_3to1 MUX_ALU_src1(
 );
 
 MUX_3to1 MUX_ALU_src2(
-    .data0_i(IDEXE_RTdata_o),
+    .data0_i(MUXALUSrc_o),
     .data1_i(RDdata_o),
     .data2_i(EXEMEM_ALUResult_o),
     .select_i(ForwardB),
@@ -265,7 +257,7 @@ ALU_Ctrl ALU_Ctrl(
 alu alu(
     .rst_n(rst_i),
     .src1(ALUSrc1_o),
-    .src2(MUXALUSrc_o),
+    .src2(ALUSrc2_o),
     .ALU_control(ALU_Ctrl_o),
     .result(ALUResult),
     .zero(ALU_zero)

@@ -10,7 +10,7 @@ wire [2:0] func3;
 assign func3 = instr[2:0];
 
 always @(*) begin
-	if(ALUOp == 2'b00) begin 			//lw,sw
+	if(ALUOp == 2'b00) begin 			//lw,sw, addi
 		ALU_Ctrl_o <= 4'b0010; 
 	end
 	else if(ALUOp == 2'b01) begin 	//beq
@@ -49,17 +49,14 @@ always @(*) begin
 	end
 	else if(ALUOp == 2'b11) begin
 		case(func3)
-            3'b000: begin              //addi
-                ALU_Ctrl_o <= 4'b0010;
-			end
             3'b001: begin              //slli
-                ALU_Ctrl_o <= 4'b0100;
+                ALU_Ctrl_o <= 4'b1100;
 			end
             3'b010: begin              //slti
                 ALU_Ctrl_o <= 4'b0111;
 			end
             3'b101: begin              //srli
-                ALU_Ctrl_o <= 4'b0001;
+                ALU_Ctrl_o <= 4'b1000;
 			end       
         endcase
 	end
