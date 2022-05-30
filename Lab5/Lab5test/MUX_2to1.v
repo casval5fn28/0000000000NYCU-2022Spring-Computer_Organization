@@ -8,9 +8,9 @@ module MUX_2to1(
 );
 /* Write your code HERE */
 always @(*) begin
-    if (select_i) begin
+    if (select_i == 1'b1) begin
         data_o <= data1_i;
-    end else begin
+    end else if (select_i == 1'b0) begin
         data_o <= data0_i;
     end
 end

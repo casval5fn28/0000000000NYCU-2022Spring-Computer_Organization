@@ -11,9 +11,9 @@ module MUX_3to1(
 always @(*) begin
     if (select_i == 2'b00) begin
         data_o <= data0_i;
-    end else if (2'b01) begin
+    end else if (select_i == 2'b01) begin
         data_o <= data1_i;
-    end else begin
+    end else if (select_i == 2'b10) begin
         data_o <= data2_i;
     end
 end

@@ -17,17 +17,10 @@ integer i;
 /* Write your code HERE */
 always@(*) begin
     case(opcode)
-        7'b0010011: begin                   //addi
-            for (i = 11; i < 32; i++) begin
-                if (instr_i[31] == 1) begin
-                    Imm_Gen_o[i] <= 1;
-                end else begin
-                    Imm_Gen_o[i] <= 0;
-                end
-            end
-            Imm_Gen_o[11:0] <= instr_i[31:20];
-        end
-        7'b0000011: begin                   //lw
+        7'b0110011: begin                   // R-type
+            Imm_Gen_o <= 0;
+        end                        
+        7'b0010011, 7'b0000011, 7'b1100111: begin //lw, addi, jalr, slti
             for (i = 11; i < 32; i++) begin
                 if (instr_i[31] == 1) begin
                     Imm_Gen_o[i] <= 1;
@@ -67,16 +60,6 @@ always@(*) begin
                 end
             end
             Imm_Gen_o[20:0] <= {instr_i[31], instr_i[19:12], instr_i[20], instr_i[30:21], 1'b0};
-        end
-        7'b1100111: begin                   //jalr
-            for (i = 11; i < 32; i++) begin
-                if (instr_i[31] == 1) begin
-                    Imm_Gen_o[i] <= 1;
-                end else begin
-                    Imm_Gen_o[i] <= 0;
-                end
-            end
-            Imm_Gen_o[11:0] <= instr_i[31:20]; 
         end
     endcase
 end
