@@ -87,8 +87,8 @@ wire [31:0] MUX_control_o_32;
 wire [31:0] RDdata_o;
 
 assign MUX_control_o = MUX_control_o_32[7:0];
-assign IFID_Flush = (Branch && Branch_zero ) || Jump;
-assign Branch_zero = (RSdata_o == RTdata_o);
+assign IFID_Flush = (Branch & Branch_zero ) | Jump;
+assign Branch_zero = (RSdata_o == RTdata_o)? 1'b1 : 1'b0;
 
 // IF
 MUX_2to1 MUX_PCSrc(
@@ -215,7 +215,7 @@ IDEXE_register IDtoEXE(
 
 // EXE
 MUX_2to1 MUX_ALUSrc (
-    .data0_i(IDEXE_RTdata_o),
+    .data0_i(ALUSrc2_o),
     .data1_i(IDEXE_ImmGen_o),
     .select_i(MUX_control_o[7]),
     .data_o(MUXALUSrc_o)
@@ -241,7 +241,7 @@ MUX_3to1 MUX_ALU_src1(
 );
 
 MUX_3to1 MUX_ALU_src2(
-    .data0_i(MUXALUSrc_o),
+    .data0_i(IDEXE_RTdata_o),
     .data1_i(RDdata_o),
     .data2_i(EXEMEM_ALUResult_o),
     .select_i(ForwardB),
@@ -257,7 +257,7 @@ ALU_Ctrl ALU_Ctrl(
 alu alu(
     .rst_n(rst_i),
     .src1(ALUSrc1_o),
-    .src2(ALUSrc2_o),
+    .src2(MUXALUSrc_o),
     .ALU_control(ALU_Ctrl_o),
     .result(ALUResult),
     .zero(ALU_zero)

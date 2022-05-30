@@ -1,6 +1,6 @@
 PC =        132
-Data Memory =          0,          0,          0,          0,          2,          0,          0,          0
-Data Memory =          0,          0,          0,          0,          0,          0,          0,         60
+Data Memory =         60,          0,          0,          0,          2,          0,          0,          0
+Data Memory =          0,          0,          0,          0,          0,          0,          0,          0
 Data Memory =          0,          0,          0,          0,          0,          0,          0,          0
 Data Memory =          0,          0,          0,          0,          0,          0,          0,          0
 Registers

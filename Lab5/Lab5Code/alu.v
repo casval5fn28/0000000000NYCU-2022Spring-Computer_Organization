@@ -16,18 +16,19 @@ wire A31, B31;
 
 assign A31 = (ALU_control[3]) ? ~src1[31] : src1[31];
 assign B31 = (ALU_control[2]) ? ~src2[31] : src2[31];
+reg [32-1:0] a,b;
 
 alu_1bit bit0(src1[0], src2[0], A31 ^ B31 ^ carry_out[30], ALU_control[3], ALU_control[2], ALU_control[2], ALU_control[1:0], res[0], carry_out[0]);
 alu_1bit bit31to1[31:1](src1[31:1], src2[31:1], less, ALU_control[3], ALU_control[2], carry_out[30:0], ALU_control[1:0], res[31:1], carry_out[31:1]);
 
 always@ (*) begin
 	
-	case(ALU_control)
+	/*case(ALU_control)
 		4'b0011: result <= src1 ^ src2;		//xor
 		4'b1100: result <= src1 << src2;	//sll
 		4'b1001: result <= src1 >>> src2;	//sra
 		default: result <= res;
-	endcase
+	endcase*/
 	
 	/*if (ALU_control[1:0] == 2'b10) begin	
 		if (carry_out[31] == 1) begin
@@ -43,12 +44,47 @@ always@ (*) begin
 	end else begin
 		cout <= 0;
 		overflow <= 0;
-	end*/
+	end*/ 
 
-	if (result == 0) begin
+	/*if (result == 0) begin
 		zero <= 1;
 	end else begin
 		zero <= 0;
+	end*/
+	a <= src1;
+    b <= src2;
+
+	if(~rst_n)begin 
+		result <= 0;
+	end
+	else begin
+		case(ALU_control)
+			4'b0010: // add,addi
+                result <= a + b;
+            4'b0110: // sub
+                result <= a - b;
+            4'b0000: // and
+                result <= a & b;
+            4'b0001: // or
+                result <= a | b;
+            4'b0011: // xor
+                result <= a ^ b;
+            4'b0111: // slt or slti
+                begin
+                    result[0] <= (a < b);
+                    result[31:1] <= 0;
+                end
+            
+            4'b1001://sra
+				result <= a >>> b; 
+            4'b1000://srli
+				result <= a >> b; 
+
+            4'b1100:// sll,slli
+				result <= a << b; 
+                
+		endcase
+        
 	end
 	
 end
