@@ -35,14 +35,11 @@ always @(*) begin
                 ALU_Ctrl_o <= 4'b0011;
 			end
             4'b0001: begin              //sll
-                ALU_Ctrl_o <= 4'b1100; 
+                ALU_Ctrl_o <= 4'b0100; 
 			end
 			4'b1101: begin              //sra
-                ALU_Ctrl_o <= 4'b1001;
+                ALU_Ctrl_o <= 4'b0101;
 			end
-            default: begin
-                ALU_Ctrl_o <= 4'b0010;
-			end         
         endcase
 	end else if(ALUOp == 2'b11) begin
 		case(func3)
@@ -50,7 +47,7 @@ always @(*) begin
                 ALU_Ctrl_o <= 4'b0010;
             end
             3'b001: begin              //slli
-                ALU_Ctrl_o <= 4'b1100;
+                ALU_Ctrl_o <= 4'b0100;
 			end
             3'b010: begin              //slti
                 ALU_Ctrl_o <= 4'b0111;

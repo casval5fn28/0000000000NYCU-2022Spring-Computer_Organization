@@ -20,7 +20,7 @@ wire [31:0] RTdata_o;
 wire [31:0] Imm_Gen_o;
 wire [31:0] ALUSrc1_o;
 wire [31:0] ALUSrc2_o;
-wire [31:0]  MUX_control_o;
+wire [31:0] MUX_control_o;
 
 wire [31:0] PC_Add_Immediate;
 wire [1:0] ALUOp;
@@ -82,14 +82,18 @@ wire [4:0]  MEMWB_Instr_11_7_o;
 wire [31:0] MEMWB_PC_Add4_o;
 
 wire [31:0] instr;
+wire [32-1:0] Imm_4 = 4;
+wire [32-1:0] zero = 0;
 
+assign MUXPCSrc = ~(Jump|(Branch&ALU_zero));
 assign Branch_zero = (RSdata_o == RTdata_o)? 1'b1 : 1'b0;
+assign IFID_Flush = Branch | Jump;
 
 // IF
 MUX_2to1 MUX_PCSrc(
     .data0_i(PC_Add_Immediate),
     .data1_i(PC_Add4),
-    .select_i(~IFID_Flush),
+    .select_i(MUXPCSrc),
     .data_o(PC_i)
 );
 
@@ -103,7 +107,7 @@ ProgramCounter PC(
 
 Adder PC_plus_4_Adder(
     .src1_i(PC_o),
-    .src2_i(4),
+    .src2_i(Imm_4),
     .sum_o(PC_Add4)
 );
 
@@ -137,15 +141,14 @@ Hazard_detection Hazard_detection_obj(
 );
 
 MUX_2to1 MUX_control(
-    .data0_i({{24{1'b0}},MemtoReg,RegWrite,Jump,MemRead,MemWrite,ALUOp,ALUSrc}),
-    .data1_i(32'b0),
+    .data0_i({{24{1'b0}}, MemtoReg, RegWrite, Jump, MemRead, MemWrite, ALUOp, ALUSrc}),
+    .data1_i(zero),
     .select_i(MUXControl),
     .data_o(MUX_control_o)
 );
 
 Decoder Decoder(
     .instr_i(IFID_Instr_o),
-    .branch_i(Branch_zero),
     .Branch(Branch),
     .ALUSrc(ALUSrc),
     .RegWrite(RegWrite),
@@ -153,8 +156,7 @@ Decoder Decoder(
     .MemRead(MemRead),
     .MemWrite(MemWrite),
     .MemtoReg(MemtoReg),
-    .Jump(Jump),
-    .Flush(IFID_Flush)
+    .Jump(Jump)
 );
 
 Reg_File RF(
@@ -214,7 +216,7 @@ IDEXE_register IDtoEXE(
 MUX_2to1 MUX_ALUSrc (
     .data0_i(IDEXE_RTdata_o),
     .data1_i(IDEXE_ImmGen_o),
-    .select_i(MUX_control_o[0]),
+    .select_i(IDEXE_Exe_o[0]),
     .data_o(MUXALUSrc_o)
 );
 
